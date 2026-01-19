@@ -93,8 +93,8 @@
         </div>
         <div class="content">
           <h1 id="attekintes">Overview - Problem Statement</h1>
-          <p style="text-align: justify;"><em>The Qingping Air Monitor 2 is a compact, Wi-Fi-enabled air quality monitoring device that tracks indoor conditions in real time. It measures PM2.5 and PM10 particle concentrations, CO₂ levels, TVOC, as well as temperature, humidity, and noise levels. The device stores the collected data in its own online database, which can be accessed programmatically via an API, making it easy to integrate into enterprise environments and enabling automation and remote data management.</em></p>
-          <p style="text-align: justify;"><em>In this project, a total of 10 air quality monitors continuously collect indoor environmental data, which is stored on the manufacturer’s server. However, the platform only keeps historical data for up to one month, which creates a limitation for long-term analysis. Therefore, it is necessary to regularly extract and store this data locally to ensure long-term availability. In addition, proper evaluation and reporting of the collected data must be carried out to generate meaningful insights.</em></p>
+          <p style="text-align: justify;"><em>This project focuses on industrial condition monitoring and predictive maintenance, aimed at building a robust vibration diagnostic network for high-value CNC machining centers. The core of the system is a custom Modbus RTU protocol implementation that allows for the simultaneous and reliable management of ten precision IMU sensors.</em></p>
+          <p style="text-align: justify;"><em>The development involved creating a scalable data acquisition network that monitors five distinct CNC machines (H1, H2, H3, H4, and STAR) in real-time. Each machine is equipped with two sensors: an "Internal" sensor on the mechanical unit and an "External" sensor on the chassis, enabling a comparative analysis of structural resonances versus machining vibrations. A primary challenge was ensuring reliable data collection at a central Master unit (PC) within an industrial environment where high-power motors generate significant electromagnetic interference (EMI). The solution utilized the RS485 physical layer combined with the Modbus RTU protocol to guarantee interference-free data transmission over long distances.</em></p>
         </div>
       </section>
 
@@ -105,28 +105,22 @@
           <div class="label">Text</div>
         </div>
         <div class="content">
-          <h2 id="fejlesztes">Development process</h2>
-          <p style="text-align: justify;"><em>First, the program connects to the server via API, then retrieves the previous day’s data from all devices and saves the available measurements in Excel format, creating a separate file for each device within a daily folder.</em></p>
-          <p style="text-align: justify;"><em>After this, a processing script runs that organizes the measurements of the same type from different devices into a single Excel file, with each measurement type placed on a separate worksheet. Processing the time columns is particularly important here: missing measurements are left as empty values, ensuring that every device’s data aligns with the correct timestamps.</em></p>
-          <p style="text-align: justify;"><em>Once this is completed, an evaluation script automatically generates a predefined chart for each worksheet, illustrating the variation of the corresponding measurement type.</em></p>
-          <p style="text-align: justify;"><em>Data recovery is handled by another script, which scans through the folders and, if it detects a missing file for any device, attempts to re-download it from the API. If the download succeeds, the aggregated Excel file is updated together with its corresponding charts.</em></p>
+          <h2 id="fejlesztes">Development process - RS485 Physical Layer Preparation</h2>
+          <p style="text-align: justify;"><em>The implementation began with the design and installation of the Physical Layer. Due to the high levels of EMI in the industrial setting, RS485 differential signaling was selected for its superior noise immunity. During the network configuration, each sensor was assigned a unique Modbus ID ranging from 0x50 to 0x59, ensuring precise addressing on the shared communication bus.</em></p>
+          <p style="text-align: justify;"><em>Critical aspects of the physical setup included specialized cabling and the strategic application of termination resistors to eliminate signal reflections. This hardware foundation provides the stability required for the Python-based Master software to poll each sensor node in the network at high-frequency 20ms intervals.</em></p>
         </div>
       </section>
 
-      <!-- CELL 3: KÉP -->
+      <!-- CELL 3: FOLYAMAT / MÓDSZER -->
       <section class="cell">
-        <!-- <h2 id="validacio">Steps</h2> -->
         <div class="gutter">
           <div class="prompt">In [3]:</div>
-          <div class="label">Image</div>
+          <div class="label">Text</div>
         </div>
         <div class="content">
-          <figure>
-            <div class="imgwrap">
-              <img src="qingping.png" alt="Steps of the development" />
-            </div>
-            <figcaption style="text-align: center;"><em>Steps</em></figcaption>
-          </figure>
+          <h2 id="fejlesztes">Development process - Modbus Programming</h2>
+          <p style="text-align: justify;"><em>The software implementation focused on developing a library-independent, byte-level Modbus RTU protocol using Python. At the "heart" of the communication logic is a manually implemented CRC-16 (Cyclic Redundancy Check) algorithm. This algorithm utilizes the 0xA001 polynomial and bit-level shifting to provide a mathematical guarantee of data integrity. Requests are constructed using the struct.pack function with a ">B B H H" format, ensuring the strict Big-endian byte order required by the Modbus standard for control data.</em></p>
+          <p style="text-align: justify;"><em>On the receiving end, the software performs real-time CRC validation before parsing the response. Raw register data—such as acceleration values retrieved from address 0x34—is decoded and scaled into human-readable physical units, specifically G-force (g) and temperature (°C). To handle the high volume of incoming data efficiently, the system utilizes buffered logging: measurements are exported via the Pandas library to CSV files only after reaching a 10,000-row threshold. This approach minimizes disk I/O latency, ensuring uninterrupted data acquisition at a 9600 baud rate.</em></p>
         </div>
       </section>
 
