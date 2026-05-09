@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Modbus project</title>
   <meta name="description" content="Google Colab-szerű, cellákra bontott egyoldalas HTML sablon." />
+  
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#1f2937',
+        primaryTextColor: '#e5e7eb',
+        primaryBorderColor: '#60a5fa',
+        lineColor: '#60a5fa',
+        secondaryColor: '#111827',
+        tertiaryColor: '#1f2937'
+      }
+    });
+  </script>
+
   <style>
     :root{
       --bg: #0b0f17;
@@ -40,7 +57,7 @@
       border:1px solid rgba(148,163,184,.25);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      overflow:hidden; /* biztosítja a mindkét oldali lekerekítést */
+      overflow:hidden;
     }
     .gutter{
       border-right:1px solid rgba(148,163,184,.15);
@@ -60,9 +77,16 @@
     .content code{font-family:var(--mono);background:var(--paper-light);border:1px solid rgba(148,163,184,.25);padding:.1rem .35rem;border-radius:6px;color:var(--accent)}
 
     figure{margin:0}
-    .imgwrap{display:block;overflow:hidden;border-radius:12px;border:1px solid rgba(148,163,184,.25)}
+    .imgwrap{display:block;overflow:hidden;border-radius:12px;border:1px solid rgba(148,163,184,.25);background: #0f172a; padding: 20px 0;}
     .imgwrap img{display:block;width:100%;height:auto}
     figcaption{margin-top:8px;color:var(--muted);font-size:14px}
+
+    /* Mermaid specifikus igazítás */
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      background: transparent;
+    }
 
     @media (max-width:860px){ .cell{grid-template-columns:72px 1fr} }
   </style>
@@ -72,10 +96,6 @@
     <div class="top">
       <span class="dot" aria-hidden="true"></span>
       <div class="title">Industrial Sensor Networking & Modbus RTU Protocol Implementation</div>
-      <div class="actions">
-        <!-- <a class="btn" href="#top">Ugrás a tetejére</a> -->
-        <!-- <a class="btn" href="#beillesztesi-utmutato">Beillesztési útmutató</a> -->
-      </div>
     </div>
   </header>
 
@@ -83,9 +103,6 @@
     <div class="notebook">
       <a id="top"></a>
 
-      <!-- ======= SZÖVEGES és KÉP CELLÁK – a Word dokumentum sorrendjében töltsd ki ======= -->
-
-      <!-- CELL 1: CÍM/ABSZTRAKT (Word: első oldal) -->
       <section class="cell">
         <div class="gutter">
           <div class="prompt">In [1]:</div>
@@ -93,28 +110,68 @@
         </div>
         <div class="content">
           <h1 id="attekintes">Overview - Problem Statement</h1>
-          <p style="text-align: justify;"><em>This project focuses on industrial condition monitoring and predictive maintenance, aimed at building a robust vibration diagnostic network for high-value CNC machining centers. The core of the system is a custom Modbus RTU protocol implementation that allows for the simultaneous and reliable management of ten precision IMU sensors.</em></p>
-          <p style="text-align: justify;"><em>The development involved creating a scalable data acquisition network that monitors five distinct CNC machines (H1, H2, H3, H4, and STAR) in real-time. Each machine is equipped with two sensors: an "Internal" sensor on the mechanical unit and an "External" sensor on the chassis, enabling a comparative analysis of structural resonances versus machining vibrations. A primary challenge was ensuring reliable data collection at a central Master unit (PC) within an industrial environment where high-power motors generate significant electromagnetic interference (EMI). The solution utilized the RS485 physical layer combined with the Modbus RTU protocol to guarantee interference-free data transmission over long distances.</em></p>
+          <p style="text-align: justify;">This project focuses on industrial condition monitoring and predictive maintenance, aimed at building a robust vibration diagnostic network for high-value CNC machining centers. The core of the system is a custom Modbus RTU protocol implementation that allows for the simultaneous and reliable management of ten precision IMU sensors.</p>
+          <p style="text-align: justify;">The development involved creating a scalable data acquisition network that monitors five distinct CNC machines (H1, H2, H3, H4, and STAR) in real-time. Each machine is equipped with two sensors: an "Internal" sensor on the mechanical unit and an "External" sensor on the chassis, enabling a comparative analysis of structural resonances versus machining vibrations. A primary challenge was ensuring reliable data collection at a central Master unit (PC) within an industrial environment where high-power motors generate significant electromagnetic interference (EMI). The solution utilized the RS485 physical layer combined with the Modbus RTU protocol to guarantee interference-free data transmission over long distances.</p>
         </div>
       </section>
 
-        <!-- CELL 2: KÉP -->
       <section class="cell">
         <div class="gutter">
           <div class="prompt">In [2]:</div>
-          <div class="label">Image</div>
+          <div class="label">Chart</div>
         </div>
         <div class="content">
           <figure>
             <div class="imgwrap">
-              <img src="dailyco2_qp.png" alt="Network topology" />
+              <div class="mermaid">
+                flowchart TD
+                  Master["💻 Master PC (Python)"]
+                  Term1["120Ω Term."]
+                  Term2["120Ω Term."]
+
+                  Master --- Term1
+                  Term1 === Bus["RS485 Bus (Modbus RTU)"] === Term2
+
+                  subgraph H1 ["CNC H1"]
+                      S50["⚙️ Int. (0x50)"]
+                      S51["📦 Ext. (0x51)"]
+                  end
+
+                  subgraph H2 ["CNC H2"]
+                      S52["⚙️ Int. (0x52)"]
+                      S53["📦 Ext. (0x53)"]
+                  end
+
+                  subgraph H3 ["CNC H3"]
+                      S54["⚙️ Int. (0x54)"]
+                      S55["📦 Ext. (0x55)"]
+                  end
+
+                  subgraph H4 ["CNC H4"]
+                      S56["⚙️ Int. (0x56)"]
+                      S57["📦 Ext. (0x57)"]
+                  end
+
+                  subgraph STAR ["CNC STAR"]
+                      S58["⚙️ Int. (0x58)"]
+                      S59["📦 Ext. (0x59)"]
+                  end
+
+                  Bus --- H1
+                  Bus --- H2
+                  Bus --- H3
+                  Bus --- H4
+                  Bus --- STAR
+
+                  style Master fill:#1e3a8a,stroke:#60a5fa,color:#fff
+                  style Bus fill:none,stroke:#60a5fa,stroke-width:4px
+              </div>
             </div>
-            <figcaption style="text-align: center;"><em>Network topology</em></figcaption>
+            <figcaption style="text-align: center;"><em>Network topology: Daisy-chained RS485 network with 10 sensor nodes</em></figcaption>
           </figure>
         </div>
       </section>
 
-      <!-- CELL 3: FOLYAMAT / MÓDSZER -->
       <section class="cell">
         <div class="gutter">
           <div class="prompt">In [3]:</div>
@@ -122,11 +179,10 @@
         </div>
         <div class="content">
           <h2 id="fejlesztes">Development process - RS485 Physical Layer Preparation</h2>
-          <p style="text-align: justify;"><em>The implementation began with the design and installation of the Physical Layer. Due to the high levels of EMI in the industrial setting, RS485 differential signaling was selected for its superior noise immunity. During the network configuration, each sensor was assigned a unique Modbus ID ranging from 0x50 to 0x59, ensuring precise addressing on the shared communication bus.</em></p>
+          <p style="text-align: justify;">The implementation began with the design and installation of the Physical Layer. Due to the high levels of EMI in the industrial setting, RS485 differential signaling was selected for its superior noise immunity. During the network configuration, each sensor was assigned a unique Modbus ID ranging from 0x50 to 0x59, ensuring precise addressing on the shared communication bus.</p>
         </div>
       </section>
 
-          <!-- CELL 4: KÉP -->
       <section class="cell">
         <div class="gutter">
           <div class="prompt">In [4]:</div>
@@ -135,38 +191,35 @@
         <div class="content">
           <figure>
             <div class="imgwrap">
-              <img src="before_after_wiring.png" alt="Custom RS485 junction hub and a 3D-printed protective enclosure" />
+              <img src="before_after_wiring.png" alt="Custom RS485 junction hub" />
             </div>
             <figcaption style="text-align: center;"><em>Custom RS485 junction hub and a 3D-printed protective enclosure</em></figcaption>
           </figure>
         </div>
       </section>
 
-        <!-- CELL 5: FOLYAMAT / MÓDSZER -->
       <section class="cell">
         <div class="gutter">
           <div class="prompt">In [5]:</div>
           <div class="label">Text</div>
         </div>
         <div class="content">
-          <h2 id="fejlesztes">Development process - RS485 Physical Layer Preparation</h2>
-          <p style="text-align: justify;"><em>Critical aspects of the physical setup included specialized cabling and the strategic application of termination resistors to eliminate signal reflections. This hardware foundation provides the stability required for the Python-based Master software to poll each sensor node in the network at high-frequency 20ms intervals.</em></p>
+          <h2 id="fejlesztes-2">Development process - RS485 Physical Layer Preparation</h2>
+          <p style="text-align: justify;">Critical aspects of the physical setup included specialized cabling and the strategic application of termination resistors to eliminate signal reflections. This hardware foundation provides the stability required for the Python-based Master software to poll each sensor node in the network at high-frequency 20ms intervals.</p>
         </div>
       </section>
 
-      <!-- CELL 6: FOLYAMAT / MÓDSZER -->
       <section class="cell">
         <div class="gutter">
           <div class="prompt">In [6]:</div>
           <div class="label">Text</div>
         </div>
         <div class="content">
-          <h2 id="fejlesztes">Development process - Modbus Programming</h2>
-          <p style="text-align: justify;"><em>The software implementation focused on developing a library-independent, byte-level Modbus RTU protocol using Python. At the "heart" of the communication logic is a manually implemented CRC-16 (Cyclic Redundancy Check) algorithm. This algorithm utilizes the 0xA001 polynomial and bit-level shifting to provide a mathematical guarantee of data integrity. Requests are constructed using the struct.pack function with a ">B B H H" format, ensuring the strict Big-endian byte order required by the Modbus standard for control data.</em></p>
+          <h2 id="fejlesztes-3">Development process - Modbus Programming</h2>
+          <p style="text-align: justify;">The software implementation focused on developing a library-independent, byte-level Modbus RTU protocol using Python. At the "heart" of the communication logic is a manually implemented CRC-16 algorithm. This algorithm utilizes the 0xA001 polynomial and bit-level shifting to provide a mathematical guarantee of data integrity. Requests are constructed using the <code>struct.pack</code> function with a ">B B H H" format, ensuring the strict Big-endian byte order required by the Modbus standard.</p>
         </div>
       </section>
 
-        <!-- CELL 7: KÉP -->
       <section class="cell">
         <div class="gutter">
           <div class="prompt">In [7]:</div>
@@ -175,26 +228,24 @@
         <div class="content">
           <figure>
             <div class="imgwrap">
-              <img src="crc_modbus_calculation.png" alt="Modbus CRC-16 algorithm using bitwise XOR and shifting" />
+              <img src="crc_modbus_calculation.png" alt="CRC-16 calculation" />
             </div>
             <figcaption style="text-align: center;"><em>Modbus CRC-16 algorithm using bitwise XOR and shifting</em></figcaption>
           </figure>
         </div>
       </section>
 
-        <!-- CELL 8: FOLYAMAT / MÓDSZER -->
       <section class="cell">
         <div class="gutter">
           <div class="prompt">In [8]:</div>
           <div class="label">Text</div>
         </div>
         <div class="content">
-          <h2 id="fejlesztes">Development process - Modbus Programming</h2>
-          <p style="text-align: justify;"><em>On the receiving end, the software performs real-time CRC validation before parsing the response. Raw register data—such as acceleration values retrieved from address 0x34—is decoded and scaled into human-readable physical units, specifically G-force (g) and temperature (°C). To handle the high volume of incoming data efficiently, the system utilizes buffered logging: measurements are exported via the Pandas library to CSV files only after reaching a 10,000-row threshold. This approach minimizes disk I/O latency, ensuring uninterrupted data acquisition at a 9600 baud rate.</em></p>
+          <h2 id="fejlesztes-4">Development process - Modbus Programming</h2>
+          <p style="text-align: justify;">On the receiving end, the software performs real-time CRC validation before parsing the response. Raw register data—such as acceleration values retrieved from address 0x34—is decoded and scaled into human-readable physical units (g and °C). To handle the high volume of data, the system utilizes buffered logging: measurements are exported via the Pandas library to CSV files only after reaching a 10,000-row threshold.</p>
         </div>
       </section>
 
-      <!-- CELL 9: KÉP -->
       <section class="cell">
         <div class="gutter">
           <div class="prompt">In [9]:</div>
@@ -205,11 +256,10 @@
             <div class="imgwrap">
               <img src="gathered_data_3.png" alt="Gathered data" />
             </div>
-            <figcaption style="text-align: center;"><em>Gathered data</em></figcaption>
+            <figcaption style="text-align: center;"><em>Gathered data representation</em></figcaption>
           </figure>
         </div>
       </section>
-
       
     </div>
   </main>
